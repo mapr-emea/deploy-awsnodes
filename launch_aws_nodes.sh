@@ -1,6 +1,5 @@
 #!/bin/bash
-# This script launches multiple nodes to be used in the installation
-# lab for the  MapR M5 Administration course.
+# This script launches multiple nodes to be used for installing MapR
 #
 # This script assumes the environment variables EC2_CERT and EC2_PRIVATE_KEY are set.
 #
@@ -27,6 +26,7 @@ let NUM_DISKS=$9
 let DISK_GB=${10}
 
 let MAX_DISKS=25
+OUTDIR=output/${NAMETAG}
 # is set in node_init_script.sh:
 #export MAPR_VERSION=5.0.0
 
@@ -40,34 +40,31 @@ printf "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n
 printf "Start timestamp for the launch_installnodes script "`date '+%Y-%m-%d %H:%M:%S'`
 printf "Start timestamp for the launch_installnodes script $(date '+%Y-%m-%d %H:%M:%S')"
 printf "\n"
-if [ -d "$NAMETAG" -o -f "$NAMETAG" ]
+if [ -d "$OUTDIR" -o -f "$OUTDIR" ]
 then
-   printf "$NAMETAG exists -- exiting this script!\n"
-   printf "please either delete $NAMETAG and rerun, or use another name tag\n"
+   printf "$OUTDIR exists -- exiting this script!\n"
+   printf "please either delete $OUTDIR and rerun, or use another name tag\n"
    exit 3
 fi
  
-# create base directory for all subsidiary files
-mkdir $NAMETAG
+# create base directory for all subsidiary files and outputs
+mkdir $OUTDIR
 if [[ $? != 0 ]]; then
-    printf "$0: Could not create dir $NAMETAG, exiting \n"
+    printf "$0: Could not create dir $OUTDIR, exiting \n"
     exit 4
 fi
 
 # Don't mess with these variables much
 #NODE_INIT_SCRIPT='node_init_script.sh'
 NODE_INIT_SCRIPT='node_init_script_new.sh'
-FILENAME_RUN=${NAMETAG}/._instance_run.out
-FILENAME_INSTANCES1=${NAMETAG}/._instance_ids_b4_verificatn
-FILENAME_INSTANCES2=${NAMETAG}/._instance_ids
-FILENAME_DETAILS=${NAMETAG}/._instance_details
-#FILENAME_INT=${NAMETAG}/hostnames-installnodes-int
-#FILENAME_EXT=${NAMETAG}/hostnames-installnodes-ext
-FILENAME_INT=${NAMETAG}/hostnames-int
-FILENAME_EXT=${NAMETAG}/hostnames-ext
-FILENAME_HTML=${NAMETAG}/hostnames.html
-#FILENAME_HOSTS=${NAMETAG}/hosts.install
-FILENAME_HOSTS=${NAMETAG}/hosts.internal
+FILENAME_RUN=${OUTDIR}/._instance_run.out
+FILENAME_INSTANCES1=${OUTDIR}/._instance_ids_b4_verificatn
+FILENAME_INSTANCES2=${OUTDIR}/._instance_ids
+FILENAME_DETAILS=${OUTDIR}/._instance_details
+FILENAME_INT=${OUTDIR}/hostnames-int
+FILENAME_EXT=${OUTDIR}/hostnames-ext
+FILENAME_HTML=${OUTDIR}/hostnames.html
+FILENAME_HOSTS=${OUTDIR}/hosts.internal
 
 ######### This is the start of the LAUNCH method.  
 #
@@ -77,7 +74,7 @@ FILENAME_HOSTS=${NAMETAG}/hosts.internal
 printf "\n "
 printf "Start timestamp for the LAUNCH method $(date '+%Y-%m-%d %H:%M:%S')"
 printf "\n"
-printf `ls -1a $NAMETAG`
+printf `ls -1a $OUTDIR`
 printf "\n"
 
 printf "Launching $NUMINSTANCES instances...\n"
@@ -242,13 +239,13 @@ printf "Storing results to '$FILENAME_INT' & '$FILENAME_EXT':\n"
 grep INSTANCE $FILENAME_DETAILS | cut -f 4 > $FILENAME_EXT
 grep INSTANCE $FILENAME_DETAILS | cut -f 5 > $FILENAME_INT
 
-echo "<table>" > $FILENAME_HTML
-echo "<tr><td>External IP</td><td>Internal Hostid</td></tr>\n" >> $FILENAME_HTML 
-cut -f 4,2 -d " " $FILENAME_DETAILS > tmp.txt; printf "<tr><td>%s</td><td>%s</td></tr>\n" $(cat "tmp.txt") >> $FILENAME_HTML
-echo "</table>" >> $FILENAME_HTML
-rm tmp.txt
+#echo "<table>" > $FILENAME_HTML
+#echo "<tr><td>External IP</td><td>Internal Hostid</td></tr>\n" >> $FILENAME_HTML 
+#cut -f 4,2 -d " " $FILENAME_DETAILS > tmp.txt; printf "<tr><td>%s</td><td>%s</td></tr>\n" $(cat "tmp.txt") >> $FILENAME_HTML
+#echo "</table>" >> $FILENAME_HTML
+#rm tmp.txt
 
-#JAMES create external hosts file 
+# create external hosts file 
 hostNum=0
 while read line 
 do 
@@ -257,8 +254,7 @@ do
    then
       pubIp=`echo $instance | awk '{print $14}'`
       hostName=`echo $instance | awk '{print $5}' | cut -d. -f1`
-#      aliasName=install_node$hostNum
-      aliasName=${NAMETAG}-${hostNum}
+      aliasName=${OUTDIR}-${hostNum}
       echo "$pubIp $hostName $aliasName" >> $FILENAME_HOSTS
       ((hostNum=$hostNum+1))
    fi

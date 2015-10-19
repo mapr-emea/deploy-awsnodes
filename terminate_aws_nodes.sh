@@ -16,9 +16,10 @@ fi
 
 NAMETAG=$1
 REGION=$2
+OUTDIR=output/${NAMETAG}
 
 # terminate instances (if existing)
-INSTANCE_FILE=${SCRIPTDIR}/${NAMETAG}/._instance_ids
+INSTANCE_FILE=${SCRIPTDIR}/${OUTDIR}/._instance_ids
 if [[ -r $INSTANCE_FILE ]]; then
     while read instance
     do 
@@ -36,7 +37,7 @@ fi
 
 # remove files and directories associated with nametag
 FILELIST="${SCRIPTDIR}/$NAMETAG.hosts ${SCRIPTDIR}/$NAMETAG.out ${SCRIPTDIR}/$NAMETAG.out"
-DIRLIST="${SCRIPTDIR}/${NAMETAG}"
+DIRLIST="${SCRIPTDIR}/${OUTDIR}"
 
 for ifile in ${FILELIST}; do
     if [[ -f $ifile ]]; then
