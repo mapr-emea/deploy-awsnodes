@@ -254,7 +254,7 @@ do
    then
       pubIp=`echo $instance | awk '{print $14}'`
       hostName=`echo $instance | awk '{print $5}' | cut -d. -f1`
-      aliasName=${OUTDIR}-${hostNum}
+      aliasName=${NAMETAG}-${hostNum}
       echo "$pubIp $hostName $aliasName" >> $FILENAME_HOSTS
       ((hostNum=$hostNum+1))
    fi
