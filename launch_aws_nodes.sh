@@ -64,7 +64,8 @@ FILENAME_DETAILS=${OUTDIR}/._instance_details
 FILENAME_INT=${OUTDIR}/hostnames-int
 FILENAME_EXT=${OUTDIR}/hostnames-ext
 FILENAME_HTML=${OUTDIR}/hostnames.html
-FILENAME_HOSTS=${OUTDIR}/hosts.internal
+FILENAME_HOSTS_INT=${OUTDIR}/hosts.internal
+FILENAME_HOSTS_EXT=${OUTDIR}/hosts.external
 
 ######### This is the start of the LAUNCH method.  
 #
@@ -253,9 +254,11 @@ do
    if [ -n "$instance" ] 
    then
       pubIp=`echo $instance | awk '{print $14}'`
+      privIp=`echo $instance | awk '{print $15}'`
       hostName=`echo $instance | awk '{print $5}' | cut -d. -f1`
       aliasName=${NAMETAG}-${hostNum}
-      echo "$pubIp $hostName $aliasName" >> $FILENAME_HOSTS
+      echo "$pubIp $hostName $aliasName" >> $FILENAME_HOSTS_EXT
+      echo "$privIp $hostName $aliasName" >> $FILENAME_HOSTS_INT
       ((hostNum=$hostNum+1))
    fi
 done < $FILENAME_DETAILS 
