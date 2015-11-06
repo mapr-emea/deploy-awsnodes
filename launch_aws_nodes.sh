@@ -246,15 +246,15 @@ grep INSTANCE $FILENAME_DETAILS | cut -f 5 > $FILENAME_INT
 #echo "</table>" >> $FILENAME_HTML
 #rm tmp.txt
 
-# create external hosts file 
+# create external and internal hosts file 
 hostNum=0
 while read line 
 do 
    instance=`echo $line | grep INSTANCE | grep running` 
    if [ -n "$instance" ] 
    then
-      pubIp=`echo $instance | awk '{print $14}'`
-      privIp=`echo $instance | awk '{print $15}'`
+      pubIp=`echo $instance | awk '{print $13}'`
+      privIp=`echo $instance | awk '{print $14}'`
       hostName=`echo $instance | awk '{print $5}' | cut -d. -f1`
       aliasName=${NAMETAG}-${hostNum}
       echo "$pubIp $hostName $aliasName" >> $FILENAME_HOSTS_EXT
